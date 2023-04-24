@@ -192,8 +192,11 @@ impl DevicePrefs {
         use DevicePrefsOp::*;
 
         let mut ret = vec![
+            #[cfg(not(feature = "no-wifi"))]
             WLANMenu,
+            #[cfg(not(feature = "no-wifi"))]
             ConnectKnownNetworksOnBoot,
+            #[cfg(not(feature = "no-wifi"))]
             WifiKill,
             AutobacklightOnBoot,
             AutobacklightTimeout,

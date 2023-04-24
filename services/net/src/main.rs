@@ -392,6 +392,10 @@ fn main() -> ! {
     thread::spawn({
         let activity_interval = activity_interval.clone();
         move || {
+            if cfg!(feature = "no-wifi") {
+                log::warn!("no-wifi feature is enabled, skipping connection manager init");
+                return;
+            }
             connection_manager::connection_manager(cm_sid, activity_interval);
         }
     });

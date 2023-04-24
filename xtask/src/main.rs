@@ -214,6 +214,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                    .add_feature("ditherpunk")
                    .add_feature("tracking-alloc")
                    .add_feature("tls")
+                   .add_feature("no-wifi")
                    // .add_feature("test-rekey")
                    .add_apps(&get_cratespecs());
         }
@@ -259,6 +260,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             builder.target_precursor(PRECURSOR_SOC_VERSION)
                    .add_services(&user_pkgs.into_iter().map(String::from).collect())
                    .add_feature("mass-storage") // add this in by default to help with testing
+                   .add_feature("no-wifi")
                    .add_apps(&get_cratespecs());
         }
         Some("app-image-xip") => {

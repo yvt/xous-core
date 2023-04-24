@@ -881,7 +881,7 @@ fn wrapped_main() -> ! {
                         '\u{1f50c}' // plugged in icon (e.g., fully charged, running on wall power now)
                     };
                     wattage_mw = wattage_mw.abs();
-                    if battstats_phase {
+                    if battstats_phase || cfg!(feature = "no-wifi") {
                         write!(&mut battstats_tv, "{}.{:02}W{}{}.{:02}V {}%",
                         wattage_mw / 1000, wattage_mw % 1000,
                         sign,
