@@ -201,14 +201,26 @@ impl<'a> Menu<'a> {
                 Point::new(canvas_size.x - self.margin, (index + 1) * self.line_height + self.margin),
             )));
 
+        let numeric_mnemonic = Some(index as u32 + 1).filter(|&x| x <= 9);
+
         if with_marker {
-            write!(item_tv.text, "\u{25B6}").unwrap();
+            if let Some(numeric_mnemonic) = numeric_mnemonic {
+                // White-on-black numeral in a circle
+                item_tv.text.push(char::from_u32(0x2775 + numeric_mnemonic).unwrap()).unwrap();
+            } else {
+                write!(item_tv.text, "\u{25B6}").unwrap();
+            }
             #[cfg(feature="tts")]
             self.tts.tts_simple(item.name.as_str().unwrap()).unwrap();
         } else {
-            write!(item_tv.text, "\t").unwrap();
+            if let Some(numeric_mnemonic) = numeric_mnemonic {
+                // Black-on-white numeral in a circle
+                item_tv.text.push(char::from_u32(0x245f + numeric_mnemonic).unwrap()).unwrap();
+            } else {
+                write!(item_tv.text, "\t").unwrap();
+            }
         }
-        write!(item_tv.text, "{}", item.name.as_str().unwrap()).unwrap();
+        write!(item_tv.text, " {}", item.name.as_str().unwrap()).unwrap();
         item_tv.draw_border = false;
         item_tv.style = GlyphStyle::Regular;
         item_tv.margin = Point::new(0, 0);
@@ -371,6 +383,25 @@ impl<'a> Menu<'a> {
                     self.next_item();
                     log::trace!("menu redraw## down key");
                     self.gam.redraw().unwrap();
+                }
+                '1'..='9' => {
+                    // Selection by number
+                    let index = k as usize - ('1' as usize);
+
+                    if index == self.index {
+                        // It's already selected; confirm the selection
+                        return self.key_event(['∴'; 4]);
+                    }
+                    
+                    if index < self.num_items() {
+                        // Update the selection
+                        self.draw_item(self.index as i16, false);
+                        self.index = index;
+                        self.draw_item(self.index as i16, true);
+                        self.gam.redraw().unwrap();
+
+                        // NOTE: if we bring back the dividers, we will need to add them
+                    }
                 }
                 _ => {}
             }
